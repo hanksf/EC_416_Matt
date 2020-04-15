@@ -1,0 +1,4 @@
+*.pdf
+Jupyter_notebooks_lectures/
+markov_approx.py
+Problem Set 1/__pycache__/markov_approx.cpython-37.pyc

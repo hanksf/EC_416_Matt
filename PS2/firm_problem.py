@@ -46,11 +46,22 @@ def backward_iterate_chebyshev(kplus,Pi,Phi,beta,alpha,delta,z,k):
         k_new[zi, :] = chebyshev.chebval(k, q)
     return k_new
 
+
 def ss_policy_chebyshev(alpha,beta,delta, Phi,Pi,z,klow,khigh, N):
     k = chebyshev_nodes(klow,khigh, N)
     kplus = np.broadcast_to(k, (len(z), len(k)))
     for it in range(1000):
         kplus = backward_iterate_chebyshev(kplus,Pi,Phi,beta,alpha,delta,z,k)
+        if it % 10 == 1 and  np.max(np.abs(kplus - kold)) < 1E-10:
+            print(f'convergence in {it} iterations!')
+            return kplus
+        kold = kplus
+
+def ss_policy_chebyshev_remapped(alpha,beta,delta, Phi,Pi,z,klow,khigh, N):
+    k = chebyshev_nodes(klow,khigh, N)
+    kplus = np.broadcast_to(k, (len(z), len(k)))
+    for it in range(1000):
+        kplus = backward_iterate_chebyshev_remapped(kplus,Pi,Phi,beta,alpha,delta,z,k,klow,khigh)
         if it % 10 == 1 and  np.max(np.abs(kplus - kold)) < 1E-10:
             print(f'convergence in {it} iterations!')
             return kplus
@@ -169,3 +180,14 @@ def ergodic_dist(Pi, kplus_i, kplus_pi):
         raise ValueError(f'No convergence after {maxit} forward iterations!')
     
     return D
+
+import numba
+@numba.njit
+def chebval_matt(x, q):
+    b_2 = 0.
+    b_1 = 0.
+    for k in range(len(q)-1, 0, -1):
+        b = q[k] + 2*x*b_1 - b_2
+        b_2 = b_1
+        b_1 = b
+    return q[0] + x*b_1 - b_2

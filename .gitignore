@@ -1,6 +1,8 @@
 *.pdf
 Jupyter_notebooks_lectures/
 markov_approx.py
-Problem Set 1/__pycache__/markov_approx.cpython-37.pyc
 others_code/
-Problem Set 1/.ipynb_checkpoints/
+Winberry/
+*.pyc
+*.ipynb_checkpoints
+shade_econ/
